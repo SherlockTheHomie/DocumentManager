@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col-xs-12">
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>{{ statusMessage }}</h3>
+                <input type="file" class="file-upload" name="document" class="form-control"
+                    (change)="uploadFile(file)" style="display:none;" #uploadDoc>
+                
+            </div>
+        </div>
+        <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+            <div class="col-xs-12">
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 100%"
+                        [attr.aria-valuenow]="uploadProgress" aria-valuemin="0" aria-valuemax="100"
+                        *ngIf="uploadProgress"></div>
+
+                    <button type="button" class="btn btn-danger" (click)="onCancelUpload()"
+                        *ngIf="uploadProgress">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <button type="button" class="btn btn-success" (click)="uploadDoc.click()">Select
+                    Document</button>
+                <button type="button" class="btn btn-danger" (click)="onCancel()">Back</button>
+            </div>
+        </div>
+    </div>
+</div>

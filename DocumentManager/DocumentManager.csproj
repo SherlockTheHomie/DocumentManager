@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="27.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.5" />
@@ -25,6 +26,22 @@
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="assets\Docs\SD\SD-I.pdf" />
+    <Content Include="assets\Docs\SD\SD-II.pdf" />
+    <Content Include="assets\Docs\SD\SD-III.pdf" />
+    <Content Include="assets\Docs\SD\SD-IV.pdf" />
+    <Content Include="assets\Docs\SD\SD-V.pdf" />
+    <Content Include="assets\Docs\SD\SD-VI.pdf" />
+    <Content Include="assets\Docs\SD\SD-VII.pdf" />
+    <Content Include="assets\Docs\SIG\SIG.pdf" />
+    <Content Include="assets\Documents.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="assets\" />
   </ItemGroup>
 
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

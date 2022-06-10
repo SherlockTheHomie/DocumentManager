@@ -1,7 +1,7 @@
 ﻿using CsvHelper;
 using System.Globalization;
 using DocumentManager.Models;
-using CsvHelper.Configuration;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -22,28 +22,21 @@ namespace DocumentManager.Data
 
         //public MyDocDataAccessLayer() { }
 
-        private class DocumentClassMap : ClassMap<Document>
-        {
-            private DocumentClassMap()
-            {
-                Map(r => r.Id).Name("Id");
-                Map(r => r.Name).Name("Name");
-                Map(r => r.Path).Name("Path");
-                Map(r => r.Category).Name("Category");
-            }
-        }
-
         public int UpdateFileList()
         {
-            var records = GetAllDocs();
+            
+
+            using (var writer = new StreamWriter(@"assets\Documents.csv"))
             {
-                using (var writer = new StreamWriter(@"assets\Documents.csv"))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
+                    var records = GetAllDocs();
+                    csv.Context.RegisterClassMap<DocumentClassMap>();
                     csv.WriteRecords((System.Collections.IEnumerable)records);
-                    return 1;
                 }
-            };
+            }
+            
+            return 1;
 
         }
 

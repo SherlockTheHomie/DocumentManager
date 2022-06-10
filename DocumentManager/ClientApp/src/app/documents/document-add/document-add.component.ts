@@ -1,10 +1,11 @@
-import { Component, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Document } from '../../shared/document.model';
 import { DocumentService } from '../documents.service';
-import { Subject, Subscription } from "rxjs";
+import { Subscription } from 'rxjs';
+
 
 
 
@@ -14,12 +15,13 @@ import { Subject, Subscription } from "rxjs";
   styleUrls: ['./document-add.component.css']
 })
 export class DocumentAddComponent implements OnInit, OnDestroy {
-  documentForm!: FormGroup;
-  file: File | null = null;
- 
   uploadProgress: number;
   statusMessage: String = "";
-  uploadSub: Subscription = new Subscription;
+  file: File | null = null;
+  fileName: string = "";
+  // files: FileList | null = null;
+  
+  uploadSub = new Subscription;
 
   constructor(
     private http: HttpClient,
@@ -28,24 +30,22 @@ export class DocumentAddComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute) { }
 
   ngOnInit() {
-
+    this.statusMessage = 'Are you trying to upload some Docs bro? Noice!';
      }
 
 
-    uploadFile = (file: any) => {
-      if (!file) {
-        return;
-      }
-      let fileToUpload = <File>file[0];
-      const formData = new FormData();
-      formData.append('file', fileToUpload, fileToUpload.name);
-
-      this.http.post('https://localhost:7185/api/docs', formData, {reportProgress: true, observe: 'events'})
+    uploadFile(newFile: File) {
+      console.log("IS THIS THING ON???");
+      let file = new FormData();
+      file.append('file', newFile, newFile.name);
+      console.log("SEND IT BOIIIIII!!");
+      this.http.post('https://localhost:7185/api/docs/new', file, {reportProgress: true, observe: 'events'})
       .subscribe({
         next: (event) => {
-          if (event.type === HttpEventType.UploadProgress)
+          if (event.type === HttpEventType.UploadProgress) {
           this.uploadProgress = Math.round(100 * event.loaded / event.total!);
-          else if (event.type === HttpEventType.Response) {
+          this.statusMessage = 'Wait for it... WAIT FOR IT';
+          } else if (event.type === HttpEventType.Response) {
           this.statusMessage = 'That Doc has been uploaded boi!!';
           this.documentsService.addDocument();
           this.onCancel();

@@ -81,18 +81,19 @@ namespace DocumentManager.Controllers
         //}
 
         [HttpPost]
+        [Route("new")]
         public async Task<IActionResult> UploadDoc(IFormFile file)
         {
             string pathWay = Path.Combine(_env.ContentRootPath, @"assets\Docs\SD\");
             try
-            {
+            {            
+ 
                 var filePath = Path.Combine(pathWay, file.Name);
 
-                using (var stream = new FileStream(filePath, FileMode.Create))
+                using (Stream fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    await file.CopyToAsync(fileStream);
                 }
-
 
                 var result = _accessLayer.UpdateFileList();
 

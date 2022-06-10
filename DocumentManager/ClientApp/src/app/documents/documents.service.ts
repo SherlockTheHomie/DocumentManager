@@ -1,5 +1,6 @@
+import { HttpClient, HttpEvent, HttpRequest } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 
 
 import { Document } from "../shared/document.model";
@@ -11,10 +12,11 @@ import { Document } from "../shared/document.model";
 @Injectable()
 export class DocumentService {
     documentsUpdate = new Subject<Document[]>();
+    private baseUrl = 'https://localhost:7185/api/docs/new';
 
     private documents: Document[] = [];
 
-    constructor() {}
+    constructor(private http: HttpClient) {}
 
     setDocuments(documents: Document[]) {
         this.documents = documents;
@@ -31,6 +33,17 @@ export class DocumentService {
 
     addDocument() {
         this.documentsUpdate.next(this.documents.slice());
+    }
+
+    uploadFile(file: File): Observable<HttpEvent<any>>{
+        const formData: FormData = new FormData();
+        formData.append('file', file);
+        const req = new HttpRequest('POST', `${this.baseUrl}/upload`, formData, {
+          reportProgress: true,
+          responseType: 'json'
+        });
+        return this.http.request(req);
+      }
     }
 
     getPreview(id: number) {

@@ -1,15 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { map, switchMap, tap } from "rxjs/operators";
-import { DataStorageService } from "../shared/data-storage.service";
-
-
+import { Subject } from "rxjs";
 import { Document } from "../shared/document.model";
-
-
-
-
 
 @Injectable({providedIn: 'root'})
 export class DocumentService {
@@ -17,9 +9,6 @@ export class DocumentService {
     documentsChanged = new Subject<Document[]>();
 
     private localDocuments: Document[] = [];
-
-
-    // documentsRefresh = new BehaviorSubject<Document[]>(this.documents);
 
     constructor(private http: HttpClient) {}
 
@@ -31,8 +20,6 @@ export class DocumentService {
         this.localDocuments = documents; 
         this.documentsChanged.next(this.localDocuments.slice());
     }
-
-
 
     getDocuments() {
         return this.localDocuments.slice(); 
@@ -50,28 +37,12 @@ export class DocumentService {
         return selectedDoc;
     }
 
-
-    
-    // removeDocument(id: number) {
-    //     return this.http.delete('https://localhost:7185/api/docs/' + id)
-    //     .pipe(
-    //         tap(() => {
-    //         this.documentsUpdate.next();
-    //     })
-    // )
-    //     .subscribe(response => {
-    //         console.log(response)
-    //     })
-
-    // }
-
-    // refreshDocuments() {
-    //     this.documentsUpdate.pipe(switchMap(_ => this.dataStorageService.fetchDocuments()))
-    // }
-
-    // deleteDocument(id: number) {
-    //     this.documents.find(doc => doc.id === id)
-    //     this.documentsUpdate.next(this.documents.slice());
-    // }
-
+    removeDocument(id: number) {
+        this.http
+        .delete(
+          'https://localhost:7185/api/docs/' + id
+          ).subscribe(response => {
+            console.log(response)
+          })
+    }
 }

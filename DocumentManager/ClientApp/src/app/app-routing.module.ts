@@ -8,7 +8,6 @@ const appRoutes: Routes = [
             m.DocumentsModule)},
 ]
 
-
 @NgModule({
     imports: [
         RouterModule.forRoot(appRoutes, {preloadingStrategy: PreloadAllModules})

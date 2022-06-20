@@ -1,7 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
-
+import { Component, Input } from '@angular/core';
 import { Document } from 'src/app/shared/document.model';
-import { DocumentService } from '../documents.service';
 
 
 
@@ -10,18 +8,7 @@ import { DocumentService } from '../documents.service';
   templateUrl: './document-item.component.html',
   styleUrls: ['./document-item.component.css']
 })
-export class DocumentItemComponent implements OnInit {
+export class DocumentItemComponent {
   @Input() document: Document;
- 
-  // @Input() name: string;
-  // @Input() path: string;
-  
-  constructor() {
-    
-   }
-
-  ngOnInit() {
-
-  }
 
 }

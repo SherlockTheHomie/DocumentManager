@@ -5,7 +5,6 @@ import { DocumentItemComponent } from "./document-item/document-item.component";
 import { DocumentlistComponent } from "./document-list/document-list.component";
 import { DocumentPreviewComponent } from "./document-preview/document-preview.component";
 import { DocumentAddComponent } from './document-add/document-add.component';
-
 import { NgxUploaderModule } from "ngx-uploader";
 import { DocumentsRoutingModule } from "./documents-routing.module";
 import { ReactiveFormsModule } from "@angular/forms";

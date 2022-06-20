@@ -1,15 +1,8 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Document } from '../../shared/document.model';
+import { Component, EventEmitter, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DocumentService } from '../documents.service';
 import { Subscription } from 'rxjs';
 import { UploaderOptions, UploadFile, UploadInput, UploadOutput } from 'ngx-uploader';
-import { DataStorageService } from 'src/app/shared/data-storage.service';
-
-
-
-
 
 @Component({
   selector: 'app-document-add',
@@ -23,19 +16,16 @@ export class DocumentAddComponent implements OnInit, OnDestroy {
   formData: FormData;
   files: UploadFile[];
   uploadInput: EventEmitter<UploadInput>;
-
-  // files: FileList | null = null;
   
   uploadSub = new Subscription;
 
   constructor(
-    private http: HttpClient,
     private router: Router,
     private route: ActivatedRoute,
     private documentsService: DocumentService,) {
     this.options = { concurrency: 1, maxUploads: 3, maxFileSize: 1000000 };
-    this.files = []; // local uploading files array
-    this.uploadInput = new EventEmitter<UploadInput>(); // input events, we use this to emit data to ngx-uploader
+    this.files = [];
+    this.uploadInput = new EventEmitter<UploadInput>(); 
      }
 
   ngOnInit() {

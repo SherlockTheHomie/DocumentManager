@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-xs-12">
         <app-document-item
-        *ngFor="let document of documents"
+        *ngFor="let document of documents | async"
         [document]="document"
         ></app-document-item>
     </div>

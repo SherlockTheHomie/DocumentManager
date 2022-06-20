@@ -1,10 +1,12 @@
-import { Component, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Document } from '../../shared/document.model';
 import { DocumentService } from '../documents.service';
 import { Subscription } from 'rxjs';
+import { UploaderOptions, UploadFile, UploadInput, UploadOutput } from 'ngx-uploader';
+import { DataStorageService } from 'src/app/shared/data-storage.service';
+
 
 
 
@@ -17,52 +19,93 @@ import { Subscription } from 'rxjs';
 export class DocumentAddComponent implements OnInit, OnDestroy {
   uploadProgress: number;
   statusMessage: String = "";
-  file: File | null = null;
-  fileName: string = "";
+  options: UploaderOptions;
+  formData: FormData;
+  files: UploadFile[];
+  uploadInput: EventEmitter<UploadInput>;
+
   // files: FileList | null = null;
   
   uploadSub = new Subscription;
 
   constructor(
     private http: HttpClient,
-    private documentsService: DocumentService,
     private router: Router,
-    private route: ActivatedRoute) { }
+    private route: ActivatedRoute,
+    private documentsService: DocumentService,) {
+    this.options = { concurrency: 1, maxUploads: 3, maxFileSize: 1000000 };
+    this.files = []; // local uploading files array
+    this.uploadInput = new EventEmitter<UploadInput>(); // input events, we use this to emit data to ngx-uploader
+     }
 
   ngOnInit() {
     this.statusMessage = 'Are you trying to upload some Docs bro? Noice!';
      }
 
-
-    uploadFile(newFile: File) {
-      console.log("IS THIS THING ON???");
-      let file = new FormData();
-      file.append('file', newFile, newFile.name);
-      console.log("SEND IT BOIIIIII!!");
-      this.http.post('https://localhost:7185/api/docs/new', file, {reportProgress: true, observe: 'events'})
-      .subscribe({
-        next: (event) => {
-          if (event.type === HttpEventType.UploadProgress) {
-          this.uploadProgress = Math.round(100 * event.loaded / event.total!);
-          this.statusMessage = 'Wait for it... WAIT FOR IT';
-          } else if (event.type === HttpEventType.Response) {
-          this.statusMessage = 'That Doc has been uploaded boi!!';
-          this.documentsService.addDocument();
-          this.onCancel();
+     onUploadOutput(output: UploadOutput): void {
+      switch (output.type) {
+        case 'allAddedToQueue':
+          break;
+        case 'addedToQueue':
+          if (typeof output.file !== 'undefined') {
+            this.files.push(output.file);
+          }
+          break;
+        case 'uploading':
+          if (typeof output.file !== 'undefined') {
+            // update current data in files array for uploading file
+            const index = this.files.findIndex(file => 
+              typeof output.file !== 'undefined' 
+              && file.id === output.file.id);
+            this.files[index] = output.file;
+          }
+          break;
+        case 'removed':
+          // remove file from array when removed
+          this.files = this.files.filter((file: UploadFile) => file !== output.file);
+          break;
+        case 'done':
+          // The file is downloaded
+          break;
       }
-    },
-    error: (err: HttpErrorResponse) => {
-      return console.log(err);
     }
-  });
-}
+
+    startUpload(): void {
+      const event: UploadInput = {
+        type: 'uploadAll',
+        url: 'https://localhost:7185/api/docs/upload',
+        method: 'POST',
+        file: this.files[0],
+        data: { FileName: this.files[0].name, FileType: this.files[0].type }
+      };
+  
+      this.uploadInput.emit(event);
+      this.statusMessage = "Your document has been saved";
+      setTimeout(() => {
+        this.documentsService.getAllDocuments();
+        this.onBack();
+      }, 2000);
+    }
+  
+    cancelUpload(id: string): void {
+      this.uploadInput.emit({ type: 'cancel', id: id });
+    }
+  
+    removeFile(id: string): void {
+      this.uploadInput.emit({ type: 'remove', id: id });
+    }
+  
+    removeAllFiles(): void {
+      this.uploadInput.emit({ type: 'removeAll' });
+    }
+
 
   onCancelUpload() {
     this.uploadSub.unsubscribe();
     this.reset()
   }
 
-  onCancel() {
+  onBack() {
     this.router.navigate(['../'], {relativeTo: this.route})
   }
 
@@ -72,7 +115,7 @@ export class DocumentAddComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log("ARE YOU DESTROYING ME????????????")
+    
   }
 
 

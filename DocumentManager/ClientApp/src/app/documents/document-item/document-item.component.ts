@@ -12,7 +12,9 @@ import { DocumentService } from '../documents.service';
 })
 export class DocumentItemComponent implements OnInit {
   @Input() document: Document;
-  @Input() id: number;
+ 
+  // @Input() name: string;
+  // @Input() path: string;
   
   constructor() {
     

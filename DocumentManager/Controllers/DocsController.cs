@@ -1,9 +1,10 @@
 ﻿using System;
-using System.IO;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using DocumentManager.Models;
 using DocumentManager.Data;
 
+using System.ComponentModel.DataAnnotations;
 
 namespace DocumentManager.Controllers
 {
@@ -24,8 +25,21 @@ namespace DocumentManager.Controllers
             _logger = logger;
             _accessLayer = accessLayer;
         }
-      
-        
+
+        public class UploadData
+        {
+            [Required(ErrorMessage = "Please input file name")]
+            [StringLength(500, ErrorMessage = "{0} cannot be greater than {1} characters.")]
+            public string? FileName { get; set; }
+
+            [Required(ErrorMessage = "Please input file type")]
+            [StringLength(50, ErrorMessage = "{0} cannot be greater than {1} characters.")]
+            
+            public string? FileType { get; set; }
+
+            [Required(ErrorMessage = "Please upload pdf file")]
+            public IFormFile? File { get; set; }
+        }
 
         // Get All Docs
         [HttpGet]
@@ -65,7 +79,6 @@ namespace DocumentManager.Controllers
             }
         }
 
-
         //[HttpPost]
         //[ProducesResponseType(typeof(Document), StatusCodes.Status200OK)]
         //[ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,19 +94,42 @@ namespace DocumentManager.Controllers
         //}
 
         [HttpPost]
-        [Route("new")]
-        public async Task<IActionResult> UploadDoc(IFormFile file)
+        [Route("upload")]
+        [ActionName("UploadDoc")]
+        public async Task<IActionResult> UploadDoc([FromForm] UploadData formData)
         {
             string pathWay = Path.Combine(_env.ContentRootPath, @"assets\Docs\SD\");
+
+            if (formData.File == null)
+            {
+                return new UnsupportedMediaTypeResult();
+            }
             try
-            {            
- 
-                var filePath = Path.Combine(pathWay, file.Name);
+            {
+                var formCollection = await Request.ReadFormAsync();
+                var file = formCollection.Files.First();
+                var docName = formData.FileName;
+                var docType = formData.FileType;
+                var docPath = Path.Combine(@"Docs\SD\", docName);
+
+                Console.WriteLine(docName);
+                Console.WriteLine(docType);
+                Console.WriteLine(docPath);
+
+                var filePath = Path.Combine(pathWay, docName);
+                Console.WriteLine(filePath);
+                var filename = Path.GetFileName(filePath);
+
+                
+                Console.WriteLine(filename);
+
 
                 using (Stream fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await file.CopyToAsync(fileStream);
                 }
+
+                await _accessLayer.AddDoc(docName, docPath);
 
                 var result = _accessLayer.UpdateFileList();
 
@@ -117,17 +153,18 @@ namespace DocumentManager.Controllers
             {
                 if (selectedDoc != null)
                 {
-                    var docPath = selectedDoc.Path;
+                    string docPath = selectedDoc.Path;
 
-                    //var filePath = docPath.Replace(@"\", @"/");
+                    Console.WriteLine("Path property of selected doc");
+                    Console.WriteLine(docPath);
 
                     var absolutePath = Path.Combine(pathWay, docPath);
 
-                    Console.WriteLine("Here I Am!");
+                    Console.WriteLine("Absolute PATH");
+                    Console.WriteLine(absolutePath);
 
                     bool status = await _accessLayer.DestroyDocument(absolutePath);
 
-                    Console.WriteLine(absolutePath);
 
                     if (status == true)
                     {
@@ -141,7 +178,8 @@ namespace DocumentManager.Controllers
 
                     else
                     {
-                        return StatusCode(500);
+                        var result = await _accessLayer.DeleteFile(id);
+                        return Ok(result);
                     }
                 }
                 else

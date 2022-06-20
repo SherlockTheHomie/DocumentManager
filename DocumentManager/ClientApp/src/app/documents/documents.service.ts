@@ -1,6 +1,8 @@
-import { HttpClient, HttpEvent, HttpRequest } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { map, switchMap, tap } from "rxjs/operators";
+import { DataStorageService } from "../shared/data-storage.service";
 
 
 import { Document } from "../shared/document.model";
@@ -9,51 +11,67 @@ import { Document } from "../shared/document.model";
 
 
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class DocumentService {
-    documentsUpdate = new Subject<Document[]>();
-    private baseUrl = 'https://localhost:7185/api/docs/new';
+    
+    documentsChanged = new Subject<Document[]>();
 
-    private documents: Document[] = [];
+    private localDocuments: Document[] = [];
+
+
+    // documentsRefresh = new BehaviorSubject<Document[]>(this.documents);
 
     constructor(private http: HttpClient) {}
 
-    setDocuments(documents: Document[]) {
-        this.documents = documents;
-        this.documentsUpdate.next(this.documents.slice());
+    get _documentsUpdate() {
+        return this.documentsChanged;
     }
 
+    setLocalDocuments(documents: Document[]) {
+        this.localDocuments = documents; 
+        this.documentsChanged.next(this.localDocuments.slice());
+    }
+
+
+
     getDocuments() {
-        return this.documents.slice();
+        return this.localDocuments.slice(); 
+    }
+
+    getAllDocuments() {  
+        return this.http.get<Document[]>('https://localhost:7185/api/docs')
+        .subscribe(response => {
+            this.setLocalDocuments(response);
+        })
     }
 
     getDocument(id: number) {
-        return this.documents[id];
+        let selectedDoc = this.localDocuments.find(doc => doc.id === id) || new Document(-1, "Not Real", "not found", "")
+        return selectedDoc;
     }
 
-    addDocument() {
-        this.documentsUpdate.next(this.documents.slice());
-    }
 
-    uploadFile(file: File): Observable<HttpEvent<any>>{
-        const formData: FormData = new FormData();
-        formData.append('file', file);
-        const req = new HttpRequest('POST', `${this.baseUrl}/upload`, formData, {
-          reportProgress: true,
-          responseType: 'json'
-        });
-        return this.http.request(req);
-      }
-    }
+    
+    // removeDocument(id: number) {
+    //     return this.http.delete('https://localhost:7185/api/docs/' + id)
+    //     .pipe(
+    //         tap(() => {
+    //         this.documentsUpdate.next();
+    //     })
+    // )
+    //     .subscribe(response => {
+    //         console.log(response)
+    //     })
 
-    getPreview(id: number) {
-        this.documents[id];
-        return this.documents[id].path;
-    }
+    // }
 
-    deleteDocument(id: number) {
-        this.documents.splice(id, 1);
-        this.documentsUpdate.next(this.documents.slice());
-    }
+    // refreshDocuments() {
+    //     this.documentsUpdate.pipe(switchMap(_ => this.dataStorageService.fetchDocuments()))
+    // }
+
+    // deleteDocument(id: number) {
+    //     this.documents.find(doc => doc.id === id)
+    //     this.documentsUpdate.next(this.documents.slice());
+    // }
 
 }

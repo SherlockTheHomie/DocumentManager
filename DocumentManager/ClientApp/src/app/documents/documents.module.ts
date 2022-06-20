@@ -6,9 +6,11 @@ import { DocumentlistComponent } from "./document-list/document-list.component";
 import { DocumentPreviewComponent } from "./document-preview/document-preview.component";
 import { DocumentAddComponent } from './document-add/document-add.component';
 
+import { NgxUploaderModule } from "ngx-uploader";
 import { DocumentsRoutingModule } from "./documents-routing.module";
 import { ReactiveFormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { PdfViewerModule } from "ng2-pdf-viewer";
 
 
 @NgModule({
@@ -23,6 +25,8 @@ import { CommonModule } from "@angular/common";
         RouterModule,
         ReactiveFormsModule,
         DocumentsRoutingModule,
+        NgxUploaderModule,
+        PdfViewerModule,
         CommonModule
     ], 
     schemas: [CUSTOM_ELEMENTS_SCHEMA]

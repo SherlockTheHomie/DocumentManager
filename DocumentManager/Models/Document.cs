@@ -11,10 +11,10 @@ namespace DocumentManager.Models
 	{
 		public Document() { }
 
-		public Document(string filePath)
+		public Document(string name, string path)
 		{
-			Name = System.IO.Path.GetFileName(filePath);
-			Path = filePath;
+			Name = name;
+			Path = path;
 		}
 
 		[Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

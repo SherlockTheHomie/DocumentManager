@@ -4,8 +4,16 @@
             <div class="row">
                 <div class="col-xs-12">
                     <h4>{{ statusMessage }}</h4>
-                    <input type="file" id="file" class="file-upload" name="document" class="form-control"
-                        (change)="uploadFile($any($event?.target).files)" style="display:none;" #uploadDoc>
+                    <input 
+                        type="file"
+                        ngFileSelect
+                        [options]="options"
+                        (uploadOutput)="onUploadOutput($event)"
+                        [uploadInput]="uploadInput" 
+                        class="file-upload" 
+                        name="document" 
+                        style="display:none;" #uploadDoc>
+                        <button type="button" class="btn btn-primary" (click)="uploadDoc.click()">Select a Doc</button>
 
                 </div>
             </div>
@@ -23,11 +31,21 @@
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <button type="button" class="btn btn-success" (click)="uploadDoc.click()">Select
-                        Document</button>
-                    <button type="button" class="btn btn-danger" (click)="onCancel()">Back</button>
+                    <button type="button" class="btn btn-success" (click)="startUpload()" >Commence Uploadination</button>
+                    <button type="button" class="btn btn-danger" (click)="onBack()">Back</button>
                 </div>
             </div>
+            <div class="upload-item" *ngFor="let f of files; let i = index;">
+            <div class="filename">
+                <div class="filename-left">
+                  <i class="ionicon ion-ios-copy"></i>
+                  <span>{{ f.name }}</span>
+                </div>
+                <div class="filename-right">
+                  <i class="ionicon ion-close-round" (click)="cancelUpload(f.id)"></i>
+                </div>
+              </div>
+        </div>
         </div>
     </div>
 </div>

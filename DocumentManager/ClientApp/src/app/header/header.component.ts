@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Subscription } from "rxjs";
-import { DataStorageService } from "../shared/data-storage.service";
+import { DocumentService } from "../documents/documents.service";
+
 
 
 @Component({
@@ -9,18 +10,17 @@ import { DataStorageService } from "../shared/data-storage.service";
     styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-    private activeUser: Subscription;
 
-    constructor(private dataStorageService: DataStorageService) {
+    constructor(private documentsService: DocumentService) {
         
     }
 
 ngOnInit() {
-    this.dataStorageService.fetchDocuments().subscribe();
+    this.documentsService.getAllDocuments();
 }
 
 ngOnDestroy() {
-    this.activeUser.unsubscribe();
+    
   }
 
 }

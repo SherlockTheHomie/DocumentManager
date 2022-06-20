@@ -7,8 +7,9 @@ namespace DocumentManager.Data
         Task<int> DeleteFile(int id);
         void Dispose();
         Task<List<Document>> GetAllDocs();
+        Task<Document> AddDoc(string name, string path);
         Task<Document> GetById(int id);
-        int UpdateFileList();
+        Task <int> UpdateFileList();
         Task <bool> DestroyDocument(string absolutePath);
         
     }

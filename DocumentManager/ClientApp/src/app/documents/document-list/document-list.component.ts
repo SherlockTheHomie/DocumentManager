@@ -1,6 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NgModel } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { Document } from 'src/app/shared/document.model';
 import { DocumentService } from '../documents.service';
 
@@ -12,8 +14,10 @@ import { DocumentService } from '../documents.service';
 export class DocumentlistComponent implements OnInit, OnDestroy {
 
 
-  documents!: Document[];
-  subscription: Subscription = new Subscription;
+
+  documents: Document[];
+  subscription: Subscription;
+
 
   constructor(
     private documentsService: DocumentService,
@@ -22,13 +26,15 @@ export class DocumentlistComponent implements OnInit, OnDestroy {
     ) { }
 
   ngOnInit() {
-    this.subscription = this.documentsService.documentsUpdate
-      .subscribe(
-        (documents: Document[]) => {
-          this.documents = documents;
-        }
-      )
-      this.documents = this.documentsService.getDocuments();
+    this.subscription = this.documentsService.documentsChanged
+    .subscribe(
+      (localDocuments: Document[]) => {
+        this.documents = localDocuments;
+        console.log(this.documents);
+        console.log(localDocuments);
+      }
+    );
+    this.documentsService.getDocuments();
   }
 
   onAddDocument() {
@@ -36,7 +42,7 @@ export class DocumentlistComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    // this.subscription.unsubscribe();
     console.log("ARE YOU DESTROYING ME????????????")
-    this.subscription.unsubscribe();
   }
 }

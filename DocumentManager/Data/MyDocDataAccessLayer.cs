@@ -21,8 +21,9 @@ namespace DocumentManager.Data
         }
 
         //public MyDocDataAccessLayer() { }
+        
 
-        public int UpdateFileList()
+        public async Task<int> UpdateFileList()
         {
             
 
@@ -30,13 +31,12 @@ namespace DocumentManager.Data
             {
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {
-                    var records = GetAllDocs();
+                    var records = await _context.Documents.ToListAsync();
                     csv.Context.RegisterClassMap<DocumentClassMap>();
                     csv.WriteRecords((System.Collections.IEnumerable)records);
                 }
-            }
-            
             return 1;
+            }
 
         }
 
@@ -70,6 +70,22 @@ namespace DocumentManager.Data
 
         }
 
+        public async Task<Document> AddDoc(string name, string path)
+        {
+            var newDoc = new Document(name, path);
+            if (newDoc != null)
+            {
+                await _context.Documents.AddAsync(newDoc);
+                await _context.SaveChangesAsync();
+                return newDoc;
+            }
+            else 
+            {
+                throw new InvalidOperationException();
+            }
+            
+        }
+
         public async Task<Document> GetById(int id)
         {
 
@@ -88,20 +104,20 @@ namespace DocumentManager.Data
             return allDocs;
         }
 
-        public Task<bool> DestroyDocument(string absolutePath)
+        public async Task<bool> DestroyDocument(string absolutePath)
         {
             if (File.Exists(absolutePath))
             {
                 File.Delete(absolutePath);
                 Console.WriteLine("Victory, your enemy is dead!");
 
-                UpdateFileList();
+                await UpdateFileList();
 
-                return Task.FromResult(true);
+                return true;
             }
             else
             {
-                return Task.FromResult(false);
+                return false;
             }
         }
     }

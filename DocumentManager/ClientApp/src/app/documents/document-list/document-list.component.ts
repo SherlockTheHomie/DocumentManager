@@ -22,8 +22,6 @@ export class DocumentlistComponent implements OnInit {
      }
 
   ngOnInit() {
-    this.documentsService.documentsChanged.subscribe();
-    this.documentsService.getDocuments();
   }
 
   onAddDocument() {

@@ -21,10 +21,6 @@ export class DocumentService {
         this.documentsChanged.next(this.localDocuments.slice());
     }
 
-    getDocuments() {
-        return this.localDocuments.slice(); 
-    }
-
     getAllDocuments() {  
         return this.http.get<Document[]>('https://localhost:7185/api/docs')
         .subscribe(response => {
